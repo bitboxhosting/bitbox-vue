@@ -2,7 +2,7 @@
   <div
     class="flex flex-col h-screen justify-center items-center bg-gradient-to-t from-base-300 to-base-100"
   >
-    <div class="max-w-lg mx-auto space-y-4">
+    <div class="w-lg mx-auto space-y-4" style="max-width: 100vw">
       <Card
         v-for="(upload, index) in uploads"
         :key="index"
@@ -24,11 +24,19 @@
       </Card>
 
       <Card>
-        <input type="file" @change="onFileSelected" class="file-input w-full" />
-        <button @click="uploadFile" class="btn btn-primary" v-if="server">
+        <input
+          type="file"
+          @change="onFileSelected"
+          class="file-input max-w-sm"
+        />
+        <button
+          @click="uploadFile"
+          class="btn btn-primary"
+          v-if="server && !invalidServerErr"
+        >
           Upload
         </button>
-        <label for="no-server-err" class="btn btn-primary" v-else>Upload</label>
+        <label for="server-err" class="btn btn-primary" v-else>Upload</label>
       </Card>
     </div>
   </div>
@@ -41,14 +49,13 @@
     ></label>
   </div>
 
-  <Modal id="no-server-err">
-    <h3 class="font-bold text-lg">No server has been selected</h3>
+  <Modal id="server-err">
+    <h3 class="font-bold text-lg">Server validation error</h3>
     <p class="py-4">
-      You need to select a server to upload to, which you can do by opening
-      settings (button in the bottom left)
+      Either no server has been selected or the server selection is invalid
     </p>
     <div class="modal-action">
-      <label for="no-server-err" class="btn">Close</label>
+      <label for="server-err" class="btn">Close</label>
     </div>
   </Modal>
 
@@ -62,6 +69,9 @@
     <div class="grid grid-cols-3 mt-8">
       <span class="font-bold block my-auto">Server</span>
       <input v-model="server" class="input bg-base-200 w-full col-span-2" />
+      <div class="alert alert-error col-span-3 mt-4" v-if="invalidServerErr">
+        The selected server is invalid
+      </div>
     </div>
   </Modal>
 </template>
@@ -72,9 +82,13 @@ import Card from './components/Card.vue'
 import Modal from './components/Modal.vue'
 import axios from 'axios'
 
+let serverInfo
+
 const selectedFile = ref(null)
 
 const server = ref('')
+
+const invalidServerErr = ref(true)
 
 if (!server.value && localStorage.server) {
   server.value = localStorage.server
@@ -82,7 +96,21 @@ if (!server.value && localStorage.server) {
 
 watch(server, async () => {
   localStorage.server = server.value
+  getServerInfo()
 })
+
+const getServerInfo = () => {
+  axios
+    .get(`${server.value}/info`)
+    .then((response) => {
+      serverInfo = response
+      invalidServerErr.value = false
+    })
+    .catch((error) => {
+      console.error(error)
+      invalidServerErr.value = true
+    })
+}
 
 const uploads = ref([])
 
