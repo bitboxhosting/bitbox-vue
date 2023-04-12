@@ -1,7 +1,16 @@
 <template>
-  <div class="flex flex-col h-screen justify-center items-center bg-gradient-to-t from-base-300 to-base-100">
+  <div
+    class="flex flex-col h-screen justify-center items-center bg-gradient-to-t from-base-300 to-base-100"
+  >
     <div class="max-w-lg mx-auto space-y-4">
-      <Card v-for="(upload, index) in uploads" :key="index" style="background-image: url('/icon-gray-lg.png'); background-size: cover;">
+      <Card
+        v-for="(upload, index) in uploads"
+        :key="index"
+        style="
+          background-image: url('/icon-gray-lg.png');
+          background-size: cover;
+        "
+      >
         <p class="text-xl break-all mt-24">{{ upload.filename }}</p>
         <div class="flex space-x-2">
           <button class="btn btn-square text-xl">
@@ -22,7 +31,9 @@
   </div>
 
   <div class="fixed bottom-4 left-4">
-    <label for="settings" class="btn btn-circle text-xl btn-outline btn-secondary"
+    <label
+      for="settings"
+      class="btn btn-circle text-xl btn-outline btn-secondary"
       ><i class="fa-solid fa-gear"></i
     ></label>
   </div>
