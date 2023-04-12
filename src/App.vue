@@ -1,0 +1,91 @@
+<template>
+  <div class="flex flex-col h-screen justify-center items-center bg-gradient-to-t from-base-300 to-base-100">
+    <div class="max-w-lg mx-auto space-y-4">
+      <Card v-for="(upload, index) in uploads" :key="index" style="background-image: url('/icon-gray-lg.png'); background-size: cover;">
+        <p class="text-xl break-all mt-24">{{ upload.filename }}</p>
+        <div class="flex space-x-2">
+          <button class="btn btn-square text-xl">
+            <i
+              class="fa-solid fa-clone"
+              @click="copy(`${server}${upload.path}`)"
+            ></i>
+          </button>
+          <input :value="upload.path" class="input font-mono w-full" readonly />
+        </div>
+      </Card>
+
+      <Card>
+        <input type="file" @change="onFileSelected" class="file-input w-full" />
+        <button @click="uploadFile" class="btn btn-primary">Upload</button>
+      </Card>
+    </div>
+  </div>
+
+  <div class="fixed bottom-4 left-4">
+    <label for="settings" class="btn btn-circle text-xl btn-outline btn-secondary"
+      ><i class="fa-solid fa-gear"></i
+    ></label>
+  </div>
+
+  <Modal id="settings">
+    <div class="flex justify-between">
+      <span class="text-xl font-bold">Settings</span>
+      <label for="settings" class="btn btn-circle btn-outline btn-sm"
+        ><i class="fa-solid fa-xmark"></i
+      ></label>
+    </div>
+    <div class="grid grid-cols-3 mt-8">
+      <span class="font-bold block my-auto">Server</span>
+      <input v-model="server" class="input bg-base-200 w-full col-span-2" />
+    </div>
+  </Modal>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import Card from './components/Card.vue'
+import Modal from './components/Modal.vue'
+import axios from 'axios'
+
+const selectedFile = ref(null)
+
+const server = ref('http://127.0.0.1:3000')
+
+const uploads = ref([])
+
+const onFileSelected = (event) => {
+  selectedFile.value = event.target.files[0]
+}
+
+const uploadFile = () => {
+  const endpointUrl = `${server.value}/upload` // replace with your API endpoint URL
+  const formData = new FormData()
+  formData.append('files', selectedFile.value)
+
+  axios
+    .post(endpointUrl, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    .then((response) => {
+      console.log(response.data), saveFileProperties(response.data)
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
+const saveFileProperties = (response) => {
+  let content = {
+    path: response,
+    filename: response.replace(/^.*\//, '')
+  }
+
+  uploads.value.push(content)
+}
+
+const copy = (str) => {
+  navigator.clipboard.writeText(str)
+}
+</script>
