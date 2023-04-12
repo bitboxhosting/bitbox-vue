@@ -48,6 +48,11 @@
       ><i class="fa-solid fa-gear"></i
     ></label>
   </div>
+  <div class="fixed bottom-20 left-4">
+    <label for="info" class="btn btn-circle text-xl btn-outline btn-accent"
+      ><i class="fa-solid fa-bars"></i
+    ></label>
+  </div>
 
   <Modal id="server-err">
     <h3 class="font-bold text-lg">Server validation error</h3>
@@ -59,12 +64,37 @@
     </div>
   </Modal>
 
+  <Modal id="info" v-if="serverInfo">
+    <div class="flex justify-between">
+      <span class="text-xl font-bold">Info</span>
+      <label for="info" class="btn btn-circle btn-outline btn-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </label>
+    </div>
+    <div class="mt-8">
+      <h2 class="font-semibold text-lg">Message from server</h2>
+      <p>{{ serverInfo.message }}</p>
+      <h2 class="font-semibold text-lg mt-8">Server rules</h2>
+      <ul v-if="serverInfo.rules" class="list-disc">
+        <li v-for="rule in serverInfo.rules">{{ rule }}</li>
+      </ul>
+    </div>
+    <div v-if="serverInfo.donate" class="mt-8">
+      <a
+        :href="serverInfo.donate"
+        class="btn btn-primary btn-circle btn-outline text-xl"
+        ><i class="fa-solid fa-money-bill-wave"></i
+      ></a>
+      Donate to this server
+    </div>
+  </Modal>
+
   <Modal id="settings">
     <div class="flex justify-between">
       <span class="text-xl font-bold">Settings</span>
-      <label for="settings" class="btn btn-circle btn-outline btn-sm"
-        ><i class="fa-solid fa-xmark"></i
-      ></label>
+      <label for="settings" class="btn btn-circle btn-outline btn-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </label>
     </div>
     <div class="grid grid-cols-3 mt-8">
       <span class="font-bold block my-auto">Server</span>
@@ -77,18 +107,22 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import Card from './components/Card.vue'
 import Modal from './components/Modal.vue'
 import axios from 'axios'
 
-let serverInfo
+const serverInfo = ref({})
 
 const selectedFile = ref(null)
 
 const server = ref('')
 
-const invalidServerErr = ref(true)
+const invalidServerErr = ref(false)
+
+onMounted(() => {
+  getServerInfo()
+})
 
 if (!server.value && localStorage.server) {
   server.value = localStorage.server
@@ -103,12 +137,13 @@ const getServerInfo = () => {
   axios
     .get(`${server.value}/info`)
     .then((response) => {
-      serverInfo = response
+      serverInfo.value = response.data
       invalidServerErr.value = false
     })
     .catch((error) => {
       console.error(error)
       invalidServerErr.value = true
+      serverInfo.value = null
     })
 }
 
