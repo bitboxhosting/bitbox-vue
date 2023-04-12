@@ -25,7 +25,10 @@
 
       <Card>
         <input type="file" @change="onFileSelected" class="file-input w-full" />
-        <button @click="uploadFile" class="btn btn-primary">Upload</button>
+        <button @click="uploadFile" class="btn btn-primary" v-if="server">
+          Upload
+        </button>
+        <label for="no-server-err" class="btn btn-primary" v-else>Upload</label>
       </Card>
     </div>
   </div>
@@ -37,6 +40,17 @@
       ><i class="fa-solid fa-gear"></i
     ></label>
   </div>
+
+  <Modal id="no-server-err">
+    <h3 class="font-bold text-lg">No server has been selected</h3>
+    <p class="py-4">
+      You need to select a server to upload to, which you can do by opening
+      settings (button in the bottom left)
+    </p>
+    <div class="modal-action">
+      <label for="no-server-err" class="btn">Close</label>
+    </div>
+  </Modal>
 
   <Modal id="settings">
     <div class="flex justify-between">
@@ -53,14 +67,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import Card from './components/Card.vue'
 import Modal from './components/Modal.vue'
 import axios from 'axios'
 
 const selectedFile = ref(null)
 
-const server = ref('http://127.0.0.1:3000')
+const server = ref('')
+
+if (!server.value && localStorage.server) {
+  server.value = localStorage.server
+}
+
+watch(server, async () => {
+  localStorage.server = server.value
+})
 
 const uploads = ref([])
 
@@ -69,7 +91,7 @@ const onFileSelected = (event) => {
 }
 
 const uploadFile = () => {
-  const endpointUrl = `${server.value}/upload` // replace with your API endpoint URL
+  const endpointUrl = `${server.value}/upload`
   const formData = new FormData()
   formData.append('files', selectedFile.value)
 
@@ -91,6 +113,10 @@ const saveFileProperties = (response) => {
   let content = {
     path: response,
     filename: response.replace(/^.*\//, '')
+  }
+
+  if (uploads.value.length > 2) {
+    uploads.value.splice(0, 1)
   }
 
   uploads.value.push(content)
