@@ -15,7 +15,13 @@
         <div class="flex space-x-2">
           <button
             class="btn btn-square text-xl"
-            @click="copy(`${server}/uploads/${upload.id}/${encodeURIComponent(upload.filename)}`)"
+            @click="
+              copy(
+                `${server}/uploads/${upload.id}/${encodeURIComponent(
+                  upload.filename
+                )}`
+              )
+            "
           >
             <i class="fa-solid fa-clone"></i>
           </button>
