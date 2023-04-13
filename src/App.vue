@@ -13,11 +13,11 @@
       >
         <p class="text-xl break-all mt-24">{{ upload.filename }}</p>
         <div class="flex space-x-2">
-          <button class="btn btn-square text-xl">
-            <i
-              class="fa-solid fa-clone"
-              @click="copy(`${server}${upload.path}`)"
-            ></i>
+          <button
+            class="btn btn-square text-xl"
+            @click="copy(`${server}${upload.path}`)"
+          >
+            <i class="fa-solid fa-clone"></i>
           </button>
           <input :value="upload.path" class="input font-mono w-full" readonly />
         </div>
