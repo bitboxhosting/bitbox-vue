@@ -102,6 +102,12 @@
       <div class="alert alert-error col-span-3 mt-4" v-if="invalidServerErr">
         The selected server is invalid
       </div>
+      <div class="alert alert-info col-span-3 mt-4" v-if="invalidServerErr">
+        <div>
+          You can try visiting it in your browser to accept the certificate, if
+          the selected server uses self-signed certs
+        </div>
+      </div>
     </div>
   </Modal>
 </template>
