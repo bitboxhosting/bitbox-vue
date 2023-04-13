@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col h-screen justify-center items-center bg-gradient-to-t from-base-300 to-base-100"
+    class="flex flex-col h-full min-h-[100vh] justify-center items-center bg-gradient-to-t from-base-300 to-base-100"
   >
     <div class="w-lg mx-auto space-y-4" style="max-width: 100vw">
       <Card
