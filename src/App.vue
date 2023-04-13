@@ -15,7 +15,7 @@
         <div class="flex space-x-2">
           <button
             class="btn btn-square text-xl"
-            @click="copy(`${server}${upload.path}`)"
+            @click="copy(`${server}/uploads/${upload.id}/${encodeURIComponent(upload.filename)}`)"
           >
             <i class="fa-solid fa-clone"></i>
           </button>
@@ -180,8 +180,9 @@ const uploadFile = () => {
 
 const saveFileProperties = (response) => {
   let content = {
-    path: response,
-    filename: response.replace(/^.*\//, '')
+    path: response.file,
+    id: response.id,
+    filename: response.file.replace(/^.*\//, '')
   }
 
   if (uploads.value.length > 2) {
