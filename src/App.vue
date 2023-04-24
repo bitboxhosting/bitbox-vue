@@ -63,7 +63,11 @@
   <Modal id="server-err">
     <h3 class="font-bold text-lg">Server validation error</h3>
     <p class="py-4">
-      Either no server has been selected or the server selection is invalid
+      Either no server has been selected or the server selection is invalid. Try
+      selecting one from the server list in
+      <span class="text-secondary font-bold"
+        >Settings <i class="fa-solid fa-gear"></i
+      ></span>
     </p>
     <div class="modal-action">
       <label for="server-err" class="btn">Close</label>
