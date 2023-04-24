@@ -108,10 +108,17 @@
       <div class="alert alert-error col-span-3 mt-4" v-if="invalidServerErr">
         The selected server is invalid
       </div>
+      
+      <span class="text-xl font-bold mt-4 col-span-3">Server List</span>
+      
       <div class="card bg-base-200 col-span-3 mt-4 p-4 space-y-3">
+        <div class="flex justify-between">
+            <span class="font-semibold text-sm">Server URL</span>
+            <span class="font-semibold text-sm">Country</span>
+        </div>
         <div class="flex justify-between" v-for="listedServer in serverList">
             <button @click="server = listedServer.url">{{ listedServer.url }}</button>
-            <span>{{ listedServer.country }}</span>
+            <span>{{ countryToFlag(listedServer.country) }}</span>
         </div>
       </div>
     </div>
@@ -221,5 +228,14 @@ const getServerList = () => {
     .catch((error) => {
       console.error(error)
     })
+}
+
+const countryToFlag = (code) => {
+  const codePoints = code
+    .toUpperCase()
+    .split('')
+    .map(char =>  127397 + char.charCodeAt());
+  
+  return String.fromCodePoint(...codePoints);
 }
 </script>
