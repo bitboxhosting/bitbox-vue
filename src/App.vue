@@ -108,15 +108,9 @@
       <div class="alert alert-error col-span-3 mt-4" v-if="invalidServerErr">
         The selected server is invalid
       </div>
-      <div class="alert alert-info col-span-3 mt-4" v-if="invalidServerErr">
-        <div>
-          You can try visiting it in your browser to accept the certificate, if
-          the selected server uses self-signed certs
-        </div>
-      </div>
       <div class="card bg-base-200 col-span-3 mt-4 p-4 space-y-3">
         <div class="flex justify-between" v-for="listedServer in serverList">
-            <button @click="server.value = listedServer.url">{{ listedServer.url }}</button>
+            <button @click="server = listedServer.url">{{ listedServer.url }}</button>
             <span>{{ listedServer.country }}</span>
         </div>
       </div>
