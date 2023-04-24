@@ -114,6 +114,12 @@
           the selected server uses self-signed certs
         </div>
       </div>
+      <div class="card bg-base-200 col-span-3 mt-4 p-4 space-y-3">
+        <div class="flex justify-between" v-for="listedServer in serverList">
+            <button @click="server.value = listedServer.url">{{ listedServer.url }}</button>
+            <span>{{ listedServer.country }}</span>
+        </div>
+      </div>
     </div>
   </Modal>
 </template>
@@ -125,15 +131,14 @@ import Modal from './components/Modal.vue'
 import axios from 'axios'
 
 const serverInfo = ref({})
-
+const serverList = ref([])
 const selectedFile = ref(null)
-
 const server = ref('')
-
 const invalidServerErr = ref(false)
 
 onMounted(() => {
   getServerInfo()
+  getServerList()
 })
 
 if (!server.value && localStorage.server) {
@@ -200,5 +205,27 @@ const saveFileProperties = (response) => {
 
 const copy = (str) => {
   navigator.clipboard.writeText(str)
+}
+
+const getServerList = () => {
+  axios
+    .get('https://raw.githubusercontent.com/bitboxhosting/extras/master/server-list.json')
+    .then((response) => {
+      response.data.forEach((item, index) => {
+        axios
+          .get(`${item}/info`)
+          .then((response) => {
+            let list = response.data
+            list.url = item
+            serverList.value.push(list)
+          })
+          .catch((error) => {
+            console.error(error)
+          })
+      })
+    })
+    .catch((error) => {
+      console.error(error)
+    })
 }
 </script>
