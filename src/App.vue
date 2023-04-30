@@ -82,6 +82,12 @@
       </label>
     </div>
     <div class="mt-8">
+      <div class="mb-8">
+        <h2>
+          <b>{{ serverInfo.server_name }}</b> run by
+          <b>{{ serverInfo.owner_name }}</b>
+        </h2>
+      </div>
       <h2 class="font-semibold text-lg">Message from server</h2>
       <p>{{ serverInfo.message }}</p>
       <h2 class="font-semibold text-lg mt-8">Server rules</h2>
@@ -112,17 +118,19 @@
       <div class="alert alert-error col-span-3 mt-4" v-if="invalidServerErr">
         The selected server is invalid
       </div>
-      
+
       <span class="text-xl font-bold mt-4 col-span-3">Server List</span>
-      
+
       <div class="card bg-base-200 col-span-3 mt-4 p-4 space-y-3">
         <div class="flex justify-between">
-            <span class="font-semibold text-sm">Server URL</span>
-            <span class="font-semibold text-sm">Country</span>
+          <span class="font-semibold text-sm">Server URL</span>
+          <span class="font-semibold text-sm">Country</span>
         </div>
         <div class="flex justify-between" v-for="listedServer in serverList">
-            <button @click="server = listedServer.url">{{ listedServer.url }}</button>
-            <span>{{ countryToFlag(listedServer.country) }}</span>
+          <button @click="server = listedServer.url">
+            {{ listedServer.url }}
+          </button>
+          <span>{{ countryToFlag(listedServer.country) }}</span>
         </div>
       </div>
     </div>
@@ -214,7 +222,9 @@ const copy = (str) => {
 
 const getServerList = () => {
   axios
-    .get('https://raw.githubusercontent.com/bitboxhosting/extras/master/server-list.json')
+    .get(
+      'https://raw.githubusercontent.com/bitboxhosting/extras/master/server-list.json'
+    )
     .then((response) => {
       response.data.forEach((item, index) => {
         axios
@@ -238,8 +248,8 @@ const countryToFlag = (code) => {
   const codePoints = code
     .toUpperCase()
     .split('')
-    .map(char =>  127397 + char.charCodeAt());
-  
-  return String.fromCodePoint(...codePoints);
+    .map((char) => 127397 + char.charCodeAt())
+
+  return String.fromCodePoint(...codePoints)
 }
 </script>
