@@ -4,7 +4,7 @@
   >
     <div class="w-lg mx-auto space-y-4" style="max-width: 100vw">
       <Card
-        v-for="(upload, index) in uploads"
+        v-for="(upload, index) in recentUploads"
         :key="index"
         style="
           background-image: url('/icon-gray-lg.png');
@@ -59,6 +59,11 @@
       ><i class="fa-solid fa-bars"></i
     ></label>
   </div>
+  <div class="fixed bottom-36 left-4">
+    <label for="uploads" class="btn btn-circle text-xl btn-outline btn-primary"
+      ><i class="fa-solid fa-file"></i
+    ></label>
+  </div>
 
   <Modal id="server-err">
     <h3 class="font-bold text-lg">Server validation error</h3>
@@ -71,6 +76,23 @@
     </p>
     <div class="modal-action">
       <label for="server-err" class="btn">Close</label>
+    </div>
+  </Modal>
+
+  <Modal id="uploads" v-if="serverInfo">
+    <div class="flex justify-between">
+      <span class="text-xl font-bold">Uploads</span>
+      <label for="uploads" class="btn btn-circle btn-outline btn-sm">
+        <i class="fa-solid fa-xmark"></i>
+      </label>
+    </div>
+    <div class="mt-8">
+      <a
+        v-for="upload in uploads.slice().reverse()"
+        :href="upload.path"
+        class="link block"
+        >{{ upload.filename }}</a
+      >
     </div>
   </Modal>
 
@@ -138,7 +160,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import Card from './components/Card.vue'
 import Modal from './components/Modal.vue'
 import axios from 'axios'
@@ -149,9 +171,13 @@ const selectedFile = ref(null)
 const server = ref('')
 const invalidServerErr = ref(false)
 
+const uploads = ref([])
+const recentUploads = computed(() => uploads.value.slice(-3))
+
 onMounted(() => {
   getServerInfo()
   getServerList()
+  getUploads()
 })
 
 if (!server.value && localStorage.server) {
@@ -162,6 +188,14 @@ watch(server, async () => {
   localStorage.server = server.value
   getServerInfo()
 })
+
+watch(
+  uploads,
+  async () => {
+    localStorage.uploads = JSON.stringify(uploads.value)
+  },
+  { deep: true }
+)
 
 const getServerInfo = () => {
   axios
@@ -176,8 +210,6 @@ const getServerInfo = () => {
       serverInfo.value = null
     })
 }
-
-const uploads = ref([])
 
 const onFileSelected = (event) => {
   selectedFile.value = event.target.files[0]
@@ -204,13 +236,9 @@ const uploadFile = () => {
 
 const saveFileProperties = (response) => {
   let content = {
-    path: response.file,
+    path: `${server.value}${response.file}`,
     id: response.id,
     filename: response.file.replace(/^.*\//, '')
-  }
-
-  if (uploads.value.length > 2) {
-    uploads.value.splice(0, 1)
   }
 
   uploads.value.push(content)
@@ -242,6 +270,12 @@ const getServerList = () => {
     .catch((error) => {
       console.error(error)
     })
+}
+
+const getUploads = () => {
+  if (localStorage.uploads) {
+    uploads.value = JSON.parse(localStorage.uploads)
+  }
 }
 
 const countryToFlag = (code) => {
