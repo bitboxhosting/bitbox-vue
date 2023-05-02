@@ -4,7 +4,7 @@
   >
     <div class="w-lg mx-auto space-y-4" style="max-width: 100vw">
       <Card
-        v-for="(upload, index) in recentUploads"
+        v-for="(upload, index) in recentUploads.slice(-3)"
         :key="index"
         style="
           background-image: url('/icon-gray-lg.png');
@@ -172,7 +172,7 @@ const server = ref('')
 const invalidServerErr = ref(false)
 
 const uploads = ref([])
-const recentUploads = computed(() => uploads.value.slice(-3))
+const recentUploads = ref([])
 
 onMounted(() => {
   getServerInfo()
@@ -242,6 +242,7 @@ const saveFileProperties = (response) => {
   }
 
   uploads.value.push(content)
+  recentUploads.value.push(content)
 }
 
 const copy = (str) => {
