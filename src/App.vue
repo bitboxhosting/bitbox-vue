@@ -43,6 +43,7 @@
           Upload
         </button>
         <label for="server-err" class="btn btn-primary" v-else>Upload</label>
+        <progress v-for="upload in uploadProgress" class="progress progress-info w-full" :value="upload" max="100"></progress>
       </Card>
     </div>
   </div>
@@ -170,6 +171,8 @@ const serverList = ref([])
 const selectedFile = ref(null)
 const server = ref('')
 const invalidServerErr = ref(false)
+const uploadProgress = ref({})
+const uploadProgressLastIndex = ref(0)
 
 const uploads = ref([])
 const recentUploads = ref([])
@@ -218,19 +221,33 @@ const onFileSelected = (event) => {
 const uploadFile = () => {
   const endpointUrl = `${server.value}/upload`
   const formData = new FormData()
+
+  const getUploadId = () => {
+    uploadProgressLastIndex.value += 1
+    uploadProgress.value[uploadProgressLastIndex.value] = 0
+    return uploadProgressLastIndex.value
+  }
+
+  const uploadId = getUploadId()
+
   formData.append('files', selectedFile.value)
 
   axios
     .post(endpointUrl, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
+      },
+      onUploadProgress: (progressEvent) => {
+          uploadProgress.value[uploadId] = parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100))
       }
     })
     .then((response) => {
       console.log(response.data), saveFileProperties(response.data)
+      delete uploadProgress.value[uploadId]
     })
     .catch((error) => {
       console.error(error)
+      delete uploadProgress.value[uploadId]
     })
 }
 
